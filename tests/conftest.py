@@ -72,6 +72,13 @@ def db(temp_db_path: Path, config_manager: ConfigManager) -> Database:
 
 
 @pytest.fixture
+def search_engine(db: Database):
+    """Create a SearchEngine with test database."""
+    from fredo.core.search import SearchEngine
+    return SearchEngine(database=db)
+
+
+@pytest.fixture
 def sample_snippet() -> Snippet:
     """Create a sample snippet for testing."""
     return Snippet(

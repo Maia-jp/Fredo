@@ -22,8 +22,8 @@ class Database:
         if self.db_path is None:
             config = config_manager.load()
             self.db_path = Path(config.database_path)
-            # Ensure parent directory exists
-            self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        # Always ensure parent directory exists
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
         return self.db_path
 
     @contextmanager

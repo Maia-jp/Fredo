@@ -37,7 +37,7 @@ class TestSearchBasic:
         for snippet in multiple_snippets:
             db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search()
         
         assert len(results) == len(multiple_snippets)
@@ -46,7 +46,7 @@ class TestSearchBasic:
 
     def test_search_empty_database(self, db: Database):
         """Test searching empty database."""
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="test")
         
         assert results == []
@@ -55,7 +55,7 @@ class TestSearchBasic:
         """Test that search returns SearchResult objects."""
         db.create(sample_snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="test")
         
         assert len(results) > 0
@@ -72,7 +72,7 @@ class TestSearchScoring:
         snippet = Snippet(name="docker-compose", content="test")
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="docker-compose")
         
         assert len(results) == 1
@@ -83,7 +83,7 @@ class TestSearchScoring:
         snippet = Snippet(name="Docker-Compose", content="test")
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="docker-compose")
         
         assert len(results) == 1
@@ -94,7 +94,7 @@ class TestSearchScoring:
         snippet = Snippet(name="docker-compose-up", content="test")
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="docker")
         
         assert len(results) == 1
@@ -109,7 +109,7 @@ class TestSearchScoring:
         )
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="docker")
         
         assert len(results) == 1
@@ -125,7 +125,7 @@ class TestSearchScoring:
         )
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="docker")
         
         assert len(results) == 1
@@ -139,7 +139,7 @@ class TestSearchScoring:
         )
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="docker")
         
         assert len(results) == 1
@@ -154,7 +154,7 @@ class TestSearchScoring:
         )
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="docker")
         
         assert len(results) == 1
@@ -169,7 +169,7 @@ class TestSearchScoring:
         )
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="docker")
         
         assert len(results) == 1
@@ -191,7 +191,7 @@ class TestSearchSorting:
         db.create(substring)
         db.create(content_only)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="docker")
         
         # Should be sorted by score
@@ -207,7 +207,7 @@ class TestSearchSorting:
         db.create(weak_match)
         db.create(strong_match)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="docker")
         
         assert results[0].snippet.name == "docker"
@@ -221,7 +221,7 @@ class TestSearchFilters:
         for snippet in multiple_snippets:
             db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(language="python")
         
         assert len(results) == 2
@@ -233,7 +233,7 @@ class TestSearchFilters:
         for snippet in multiple_snippets:
             db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(tags=["hello"])
         
         assert len(results) == 2
@@ -245,7 +245,7 @@ class TestSearchFilters:
         for snippet in multiple_snippets:
             db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(tags=["docker", "api"])
         
         # Should match snippets with docker OR api
@@ -261,7 +261,7 @@ class TestSearchFilters:
         for snippet in multiple_snippets:
             db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="hello", language="python")
         
         assert len(results) == 1
@@ -277,7 +277,7 @@ class TestSearchFilters:
         )
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(
             query="docker",
             language="python",
@@ -296,7 +296,7 @@ class TestSearchLimit:
         for snippet in multiple_snippets:
             db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(limit=3)
         
         assert len(results) == 3
@@ -308,7 +308,7 @@ class TestSearchLimit:
         for snippet in multiple_snippets:
             db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(limit=100)
         
         assert len(results) == len(multiple_snippets)
@@ -318,7 +318,7 @@ class TestSearchLimit:
         for snippet in multiple_snippets:
             db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(limit=0)
         
         assert len(results) == 0
@@ -328,7 +328,7 @@ class TestSearchLimit:
         for snippet in multiple_snippets:
             db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="python", limit=1)
         
         assert len(results) == 1
@@ -344,7 +344,7 @@ class TestSearchEdgeCases:
         for snippet in multiple_snippets:
             db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="")
         
         # Empty query treated as no query
@@ -355,7 +355,7 @@ class TestSearchEdgeCases:
         snippet = Snippet(name="test-c++", content="c++ code")
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="c++")
         
         assert len(results) == 1
@@ -366,7 +366,7 @@ class TestSearchEdgeCases:
         snippet = Snippet(name="test-世界", content="世界")
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="世界")
         
         assert len(results) == 1
@@ -377,7 +377,7 @@ class TestSearchEdgeCases:
         for snippet in multiple_snippets:
             db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="nonexistent-query-xyz")
         
         assert results == []
@@ -387,7 +387,7 @@ class TestSearchEdgeCases:
         snippet = Snippet(name="completely-different", content="nothing relevant")
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="xyz")
         
         # Only matches with score > 0 are returned
@@ -400,7 +400,7 @@ class TestSearchEdgeCases:
         
         long_query = "x" * 1000
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query=long_query)
         
         # Should handle gracefully
@@ -411,7 +411,7 @@ class TestSearchEdgeCases:
         snippet = Snippet(name="Docker-Compose", content="DOCKER commands")
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="docker")
         
         assert len(results) == 1
@@ -422,7 +422,7 @@ class TestSearchEdgeCases:
         snippet = Snippet(name="kubernetes-deployment", content="test")
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="kube")
         
         assert len(results) == 1
@@ -433,7 +433,7 @@ class TestSearchEdgeCases:
         snippet = Snippet(name="docker-compose", content="test")
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         # Slight typo
         results = engine.search(query="dokcer")
         
@@ -449,7 +449,7 @@ class TestSearchEdgeCases:
         )
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="docker")
         
         # Should get high score from multiple tag matches
@@ -465,7 +465,7 @@ class TestSearchIntegration:
         for snippet in multiple_snippets:
             db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(language="python")
         
         # Should only get python snippets from database
@@ -478,7 +478,7 @@ class TestSearchIntegration:
         for snippet in multiple_snippets:
             db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         # First filter by language, then fuzzy match on query
         results = engine.search(query="hello", language="bash")
         
@@ -525,7 +525,7 @@ class TestSearchPerformance:
             )
             db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="snippet")
         
         # Should handle many results efficiently
@@ -537,7 +537,7 @@ class TestSearchPerformance:
         snippet = Snippet(name="large-snippet", content=large_content)
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="large")
         
         assert len(results) == 1
@@ -550,7 +550,7 @@ class TestSearchPerformance:
         snippet = Snippet(name="test", content=content)
         db.create(snippet)
         
-        engine = SearchEngine()
+        engine = SearchEngine(database=db)
         results = engine.search(query="docker")
         
         # Should still find it (though score might be lower)

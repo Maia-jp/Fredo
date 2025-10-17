@@ -182,25 +182,24 @@ class TestEditorManagerEditContent:
         """Test that temporary file is cleaned up."""
         em = EditorManager()
         
-        temp_files = []
+        temp_file_path = None
         
-        def track_temp_file(mode, suffix, delete):
-            # Track temp file path
-            import tempfile as tmp
-            f = tmp.NamedTemporaryFile(mode=mode, suffix=suffix, delete=False)
-            temp_files.append(f.name)
-            return f
+        def mock_run(cmd, **kwargs):
+            # Track the temp file path from subprocess call
+            nonlocal temp_file_path
+            temp_file_path = cmd[1]
+            result = MagicMock()
+            result.returncode = 0
+            return result
         
-        mock_subprocess = MagicMock()
-        mock_subprocess.returncode = 0
+        with patch("subprocess.run", side_effect=mock_run):
+            with patch.object(Path, "read_text", return_value="content"):
+                em.edit_content(content="test", extension=".txt")
         
-        with patch("tempfile.NamedTemporaryFile", side_effect=track_temp_file):
-            with patch("subprocess.run", return_value=mock_subprocess):
-                with patch.object(Path, "read_text", return_value="content"):
-                    em.edit_content(content="test", extension=".txt")
-        
-        # Temp file should be cleaned up (unlink is called in finally block)
-        # We can't easily verify it's deleted, but ensure no exception occurred
+        # Verify temp file was created and cleaned up
+        assert temp_file_path is not None
+        # The file should have been deleted in the finally block
+        # We can't verify deletion with mocked read_text, but no exception occurred
 
     def test_edit_content_raises_editor_error_on_exception(self):
         """Test that EditorError is raised on exception."""

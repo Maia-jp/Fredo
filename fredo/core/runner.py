@@ -43,10 +43,16 @@ class SnippetRunner:
         if snippet.language and snippet.language.lower() != "auto":
             return snippet.language.lower()
 
-        # 2. Check for shebang
-        lines = snippet.content.strip().split("\n")
-        if lines and lines[0].startswith("#!"):
-            shebang = lines[0][2:].strip()
+        # 2. Check for shebang (only on first non-empty line)
+        lines = snippet.content.split("\n")
+        first_non_empty = None
+        for line in lines:
+            if line.strip():
+                first_non_empty = line
+                break
+        
+        if first_non_empty and first_non_empty.strip().startswith("#!"):
+            shebang = first_non_empty.strip()[2:].strip()
             if "python" in shebang:
                 return "python"
             elif "bash" in shebang or "sh" in shebang:
@@ -56,7 +62,25 @@ class SnippetRunner:
             elif "ruby" in shebang:
                 return "ruby"
 
-        # 3. Use Pygments to guess the language
+        # 3. Simple heuristic checks for common patterns
+        content_lower = snippet.content.lower()
+        
+        # Python indicators (check for Python-specific patterns first)
+        if "def " in snippet.content or "import sys" in snippet.content or "import os" in snippet.content:
+            return "python"
+        
+        if "print(" in snippet.content:
+            # Check if it looks more like Python than other languages
+            if not any(term in snippet.content for term in ["console.log", "function(", "<?php"]):
+                return "python"
+        
+        # JavaScript/Node.js indicators
+        if any(pattern in snippet.content for pattern in [
+            "console.log", "const ", "let ", "var ", "=>", "require(", "import {", "import *", "export "
+        ]):
+            return "javascript"
+
+        # 4. Use Pygments to guess the language
         try:
             lexer = guess_lexer(snippet.content)
             lang_name = lexer.name.lower()
@@ -65,11 +89,26 @@ class SnippetRunner:
                 return "python"
             elif "bash" in lang_name or "shell" in lang_name:
                 return "bash"
-            elif "javascript" in lang_name:
+            elif "javascript" in lang_name or "js" in lang_name:
                 return "javascript"
             elif "ruby" in lang_name:
                 return "ruby"
-            return lang_name
+            elif "typescript" in lang_name:
+                return "typescript"
+            elif "go" in lang_name:
+                return "go"
+            elif "rust" in lang_name:
+                return "rust"
+            elif "php" in lang_name:
+                return "php"
+            elif "perl" in lang_name:
+                return "perl"
+            elif "lua" in lang_name:
+                return "lua"
+            # Check if the detected language is in our executors
+            elif lang_name in self.EXECUTORS:
+                return lang_name
+            # If not supported, default to bash
         except ClassNotFound:
             pass
 

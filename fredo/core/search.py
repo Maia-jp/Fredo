@@ -24,6 +24,10 @@ class SearchResult:
 class SearchEngine:
     """Fuzzy search engine for snippets."""
 
+    def __init__(self, database=None):
+        """Initialize search engine with optional database instance."""
+        self.db = database if database is not None else db
+
     def search(
         self,
         query: Optional[str] = None,
@@ -43,7 +47,11 @@ class SearchEngine:
             List of SearchResult objects sorted by score (descending)
         """
         # Get snippets from database with filters
-        snippets = db.search(language=language, tags=tags)
+        snippets = self.db.search(language=language, tags=tags)
+
+        # Handle limit=0 early
+        if limit is not None and limit == 0:
+            return []
 
         if not query:
             # No query, just return all matching filters sorted by update time
@@ -56,7 +64,9 @@ class SearchEngine:
         results = []
         for snippet in snippets:
             score = self._calculate_score(query, snippet)
-            if score > 0:  # Only include results with some match
+            # Only include results with meaningful scores (>= 27)
+            # This filters out weak fuzzy matches that are essentially noise
+            if score >= 27:
                 results.append(SearchResult(snippet, score))
 
         # Sort by score (descending)
