@@ -16,14 +16,17 @@ parts/
 sdist/
 var/
 wheels/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
 # Virtual environments
 venv/
 env/
 ENV/
+.venv
 
 # IDEs
 .vscode/
@@ -31,20 +34,39 @@ ENV/
 *.swp
 *.swo
 *~
-
-# OS
 .DS_Store
-Thumbs.db
-
-# Project specific
-.uv/
-*.db
-*.db-journal
 
 # Testing
 .pytest_cache/
 .coverage
+.coverage.*
 htmlcov/
+.tox/
+.hypothesis/
 
 # Distribution
 *.whl
+dist/
+build/
+
+# Database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+
+# Project specific
+.uv/
+uv.lock
+
+# Temporary files
+tmp/
+temp/
+*.tmp

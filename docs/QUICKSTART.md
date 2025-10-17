@@ -156,7 +156,7 @@ fredo run --help
 
 ## What's Next?
 
-- Read [README.md](README.md) for full documentation
+- Read [README.md](../README.md) for full documentation
 - Check [EXAMPLES.md](EXAMPLES.md) for practical examples
 - Start building your snippet library!
 
